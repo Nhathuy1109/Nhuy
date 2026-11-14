@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thư viện tài liệu</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#fde4ec;--pink2:#f9c6d8;--blue:#dff1fb;--blue2:#b9e0f4;--ink:#2b2a35;--muted:#6b6a78;--line:#ecdfe6;--accent:#c2336b;--accent2:#2a7fae;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font:16px/1.6 "Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:linear-gradient(120deg,var(--pink),var(--blue));padding:18px 16px 16px;border-bottom:1px solid var(--line)}
+.wrap{max-width:900px;margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+h1{margin:0;font-size:1.4rem;cursor:pointer;color:var(--accent)}
+#q{width:100%;padding:12px 16px;border:1px solid var(--pink2);border-radius:999px;font:inherit;background:#fff}
+button,.btn{font:inherit;cursor:pointer}
+.btn{display:inline-block;background:var(--accent);color:#fff;border:0;border-radius:999px;padding:9px 18px;font-weight:700}
+.btn.soft{background:#fff;color:var(--accent);border:1px solid var(--pink2)}
+.btn.blue{background:var(--accent2)}
+.btn.sm{padding:5px 12px;font-size:.85rem}
+:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
+main{padding:22px 16px 56px}
+h2{font-size:1.2rem;margin:0 0 14px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.card{border:0;border-radius:16px;padding:20px 16px;text-align:left;color:var(--ink);background:var(--pink);min-height:96px}
+.card:nth-child(even){background:var(--blue)}
+.card b{display:block;font-size:1.05rem}
+.card span{color:var(--muted);font-size:.85rem}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.tab{border:1px solid var(--pink2);background:#fff;border-radius:999px;padding:8px 16px;color:var(--ink)}
+.tab[aria-pressed="true"]{background:var(--pink);border-color:var(--accent);font-weight:700;color:var(--accent)}
+.item{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;border:1px solid var(--line);border-left:5px solid var(--blue2);border-radius:10px;padding:10px 14px;margin-bottom:8px}
+.item b{overflow-wrap:anywhere}
+.item small{color:var(--muted);display:block}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.hint{color:var(--muted);background:var(--blue);border-radius:10px;padding:10px 14px;font-size:.9rem;margin-bottom:14px}
+.empty{color:var(--muted);padding:16px 0}
+.back{background:none;border:0;color:var(--accent2);padding:0;margin-bottom:10px;font-weight:500}
+iframe{width:100%;height:78vh;border:1px solid var(--line);border-radius:12px}
+.link{background:none;border:0;color:var(--accent2);text-decoration:underline;padding:0}
+.login{max-width:380px;margin:20px auto}
+.seg{display:flex;background:var(--pink);border-radius:999px;padding:4px;margin-bottom:18px}
+.seg button{flex:1;border:0;background:none;border-radius:999px;padding:9px;color:var(--ink);font-weight:500}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--accent);font-weight:700}
+.login label{display:block;font-size:.9rem;margin:10px 0 4px}
+.login input{width:100%;padding:11px 14px;border:1px solid var(--pink2);border-radius:10px;font:inherit}
+#bn{flex:1;min-width:180px;padding:8px 14px;border:1px solid var(--pink2);border-radius:10px;font:inherit}
+.err{color:#b3261e;background:#fdecea;border-radius:8px;padding:8px 12px;margin-top:12px;font-size:.9rem}
+.tag{display:inline-block;background:var(--pink);color:var(--accent);border-radius:999px;padding:0 10px;font-size:.8rem}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="top"><h1 id="home">Thư viện tài liệu</h1><button class="btn soft sm" id="own"></button></div>
+  <input id="q" type="search" placeholder="Tìm tài liệu, môn học…" aria-label="Tìm tài liệu">
+</div></header>
+<main><div class="wrap" id="app"></div></main>
+
+<script>
+/* ====== CÀI ĐẶT: ĐỔI MẬT KHẨU CHỦ WEB TẠI ĐÂY ====== */
+const OWNER_USER = "Nhuy110927";
+const OWNER_HASH = "7290a160da18ece6e8c9b61d33b7f725e1087f9473eda624fe0a416b9e148c67"; // mã băm SHA-256 của mật khẩu Owner
+const MAX_MB = 3; // giới hạn dung lượng mỗi file
+const SEC = [
+  ["theory","Lý thuyết","Tải lên tài liệu lý thuyết (PDF, Word, ảnh…)","*"],
+  ["quizfile","File trắc nghiệm","Tải lên file đề trắc nghiệm để người dùng tải về","*"],
+  ["practice","Thực hành trắc nghiệm","Tải lên file .html để người dùng làm bài trực tiếp",".html,.htm"]
+];
+const KEY = "thu-vien-du-lieu";
+let S = { subjects: [], blocked: [] }, me = null, owner = false, sec = "theory", run = null, q = "", tab = "user", mode = "login", msg = "", page = "";
+try { me = JSON.parse(sessionStorage.getItem("me")); owner = !!me && me.role === "owner"; } catch(e){}
+const setMe = m => { me = m; owner = !!m && m.role === "owner"; m ? sessionStorage.setItem("me", JSON.stringify(m)) : sessionStorage.removeItem("me"); };
+const getUsers = () => { try { return JSON.parse(localStorage.getItem("thu-vien-nguoi-dung") || "{}"); } catch(e){ return {}; } };
+const setUsers = u => localStorage.setItem("thu-vien-nguoi-dung", JSON.stringify(u));
+const sha = async t => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("tv|" + t)))].map(b => b.toString(16).padStart(2, "0")).join("");
+const app = document.getElementById("app");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const uid = () => Date.now().toString(36) + Math.floor(Math.random()*1e3).toString(36);
+const subj = id => S.subjects.find(s => s.id === id);
+const curId = () => { const h = location.hash.slice(1); return h.startsWith("mon-") ? h.slice(4) : null; };
+
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify(S)); }
+  catch(e){ alert("Bộ nhớ trình duyệt đã đầy. Hãy xóa bớt file hoặc dùng file nhỏ hơn."); }
+}
+async function load(){
+  let remote = {};
+  try { const r = await fetch("data.json", {cache:"no-store"}); if (r.ok) remote = await r.json(); } catch(e){}
+  try { const l = localStorage.getItem(KEY); if (l) S = JSON.parse(l); else if (remote.subjects) S = remote; } catch(e){}
+  S.subjects = S.subjects || [];
+  S.blocked = [...new Set([...(S.blocked || []), ...(remote.blocked || [])].map(x => String(x).toLowerCase()))];
+}
+
+function render(){
+  const ob = document.getElementById("own");
+  ob.style.display = document.getElementById("q").style.display = me ? "" : "none";
+  if (!me) return loginPage();
+  ob.textContent = "Đăng xuất (" + me.name + ")";
+  if (!owner && S.blocked.includes(me.username.toLowerCase())) { setMe(null); msg = "Tài khoản này đã bị chặn."; return loginPage(); }
+  if (page === "users" && owner) return usersPage();
+  if (run) return viewer();
+  if (q.trim()) return results();
+  const id = curId(), s = id && subj(id);
+  return s ? subject(s) : homePage();
+}
+
+function homePage(){
+  let h = `<div class="bar"><h2>Môn học</h2>` + (owner ? `<span class="acts"><button class="btn" data-a="addSub">+ Thêm môn học</button><button class="btn soft" data-a="users">Quản lý người dùng</button><button class="btn soft" data-a="export">Xuất data.json</button></span>` : "") + `</div>`;
+  if (owner) h += `<p class="hint">Bạn đang ở chế độ chủ web. Sau khi thêm tài liệu, bấm “Xuất data.json” rồi tải file đó lên cùng chỗ với index.html để mọi người nhìn thấy.</p>`;
+  h += S.subjects.length ? `<div class="grid">` + S.subjects.map(s => `<button class="card" data-a="sub" data-i="${s.id}"><b>${esc(s.name)}</b><span>${s.theory.length + s.quizfile.length + s.practice.length} tài liệu</span></button>`).join("") + `</div>` : `<p class="empty">Chưa có môn học nào.${owner ? "" : " Chủ web sẽ sớm cập nhật."}</p>`;
+  app.innerHTML = h;
+}
+
+function subject(s){
+  const [k,, desc, acc] = SEC.find(x => x[0] === sec);
+  let h = `<button class="back" data-a="home">← Tất cả môn học</button><div class="bar"><h2>${esc(s.name)}</h2>` + (owner ? `<button class="btn soft sm" data-a="delSub" data-i="${s.id}">Xóa môn</button>` : "") + `</div><div class="tabs">` +
+    SEC.map(x => `<button class="tab" data-a="tab" data-i="${x[0]}" aria-pressed="${x[0] === sec}">${x[1]}</button>`).join("") + `</div>`;
+  if (owner) h += `<p class="hint">${desc}</p><p><label class="btn blue">+ Tải file lên<input type="file" id="up" accept="${acc}" hidden></label></p>`;
+  const list = s[k];
+  h += list.length ? list.map(f => `<div class="item"><div><b>${esc(f.name)}</b><small>${esc(f.date || "")}</small></div><div class="acts">` +
+    (k === "practice" ? `<button class="btn sm" data-a="run" data-i="${f.id}">Làm bài</button>` : `<button class="btn sm" data-a="open" data-i="${f.id}">Xem</button>`) +
+    `<button class="btn soft sm" data-a="dl" data-i="${f.id}">Tải về</button>` +
+    (owner ? `<button class="btn soft sm" data-a="delFile" data-i="${f.id}">Xóa</button>` : "") + `</div></div>`).join("") : `<p class="empty">Chưa có tài liệu trong mục này.</p>`;
+  app.innerHTML = h;
+}
+
+function results(){
+  const t = q.trim().toLowerCase(), out = [];
+  S.subjects.forEach(s => {
+    if (s.name.toLowerCase().includes(t)) out.push(`<button class="item" style="width:100%;text-align:left;background:#fff" data-a="sub" data-i="${s.id}"><div><b>${esc(s.name)}</b><small>Môn học</small></div></button>`);
+    SEC.forEach(([k, label]) => s[k].forEach(f => { if (f.name.toLowerCase().includes(t)) out.push(`<button class="item" style="width:100%;text-align:left;background:#fff" data-a="goto" data-i="${s.id}" data-j="${k}"><div><b>${esc(f.name)}</b><small>${esc(s.name)} • ${label}</small></div></button>`); }));
+  });
+  app.innerHTML = `<h2>Kết quả tìm kiếm (${out.length})</h2>` + (out.join("") || `<p class="empty">Không tìm thấy tài liệu phù hợp.</p>`);
+}
+
+function viewer(){
+  app.innerHTML = `<button class="back" data-a="stop">← Quay lại</button><h2>${esc(run.name)}</h2><iframe sandbox="allow-scripts allow-forms allow-modals" title="${esc(run.name)}"></iframe>`;
+  app.querySelector("iframe").srcdoc = run.data;
+}
+
+function loginPage(){
+  const u = tab === "user", reg = u && mode === "register";
+  app.innerHTML = `<div class="login"><div class="seg"><button type="button" data-a="lt" data-i="user" aria-pressed="${u}">User</button><button type="button" data-a="lt" data-i="owner" aria-pressed="${!u}">Owner</button></div>
+  <h2>${!u ? "Đăng nhập Owner" : reg ? "Đăng ký tài khoản" : "Đăng nhập"}</h2>
+  <form id="lf">${reg ? `<label for="fn">Họ và tên</label><input id="fn" name="fn" placeholder="VD: Tăng Nhật Huy" required>` : ""}
+  <label for="un">Tên đăng nhập</label><input id="un" name="un" placeholder="${u ? "VD: Nhuy123" : "Tên đăng nhập Owner"}" autocomplete="username" required>
+  <label for="pw">Mật khẩu</label><input id="pw" name="pw" type="password" placeholder="${u ? "VD: Nhathuy123" : "Mật khẩu Owner"}" autocomplete="${reg ? "new-password" : "current-password"}" required>
+  ${msg ? `<div class="err" role="alert">${esc(msg)}</div>` : ""}
+  <p><button class="btn" style="width:100%">${reg ? "Đăng ký" : "Đăng nhập"}</button></p></form>
+  ${u ? `<p style="text-align:center">${reg ? "Đã có tài khoản?" : "Chưa có tài khoản?"} <button class="link" data-a="sw">${reg ? "Đăng nhập" : "Đăng ký"}</button></p>` : ""}</div>`;
+}
+function usersPage(){
+  const users = getUsers(), keys = Object.keys(users), bl = S.blocked;
+  const row = (k, name, sub) => `<div class="item"><div><b>${esc(name)}</b><small>${esc(sub)}</small></div><div class="acts">${bl.includes(k) ? `<span class="tag">Đã chặn</span>` : ""}<button class="btn soft sm" data-a="blk" data-i="${esc(k)}">${bl.includes(k) ? "Bỏ chặn" : "Chặn"}</button></div></div>`;
+  app.innerHTML = `<button class="back" data-a="home">← Về trang chủ</button><h2>Quản lý người dùng</h2>
+  <p class="hint">Chặn xong, bấm “Xuất data.json” ở trang chủ rồi tải file đó lên web để lệnh chặn có hiệu lực với mọi người. Danh sách bên dưới chỉ gồm tài khoản đã đăng ký trên trình duyệt này.</p>
+  <form id="bf" class="acts" style="margin-bottom:14px"><input id="bn" placeholder="Nhập tên đăng nhập cần chặn" aria-label="Tên đăng nhập cần chặn"><button class="btn sm">Chặn</button></form>` +
+  keys.map(k => row(k, users[k].name, users[k].username + " • đăng ký " + users[k].created)).join("") +
+  bl.filter(k => !keys.includes(k)).map(k => row(k, k, "Chưa thấy trên trình duyệt này")).join("") +
+  (keys.length || bl.length ? "" : `<p class="empty">Chưa có người dùng nào.</p>`);
+}
+const fail = m => { msg = m; render(); };
+app.addEventListener("submit", async e => {
+  e.preventDefault();
+  const f = e.target;
+  if (f.id === "bf") { const k = f.elements.bn.value.trim().toLowerCase(); if (k && !S.blocked.includes(k)) { S.blocked.push(k); save(); } return render(); }
+  const val = n => f.elements[n] ? f.elements[n].value.trim() : "", un = val("un"), pw = f.elements.pw.value, k = un.toLowerCase();
+  try {
+    if (tab === "owner") {
+      if (k === OWNER_USER.toLowerCase() && await sha(pw) === OWNER_HASH) { msg = ""; setMe({role:"owner", username:OWNER_USER, name:"Owner"}); location.hash = ""; return render(); }
+      return fail("Sai tên đăng nhập hoặc mật khẩu Owner.");
+    }
+    const users = getUsers();
+    if (mode === "register") {
+      const name = val("fn");
+      if (!/^[A-Za-z0-9_]{3,20}$/.test(un)) return fail("Tên đăng nhập gồm 3-20 ký tự: chữ không dấu, số hoặc dấu gạch dưới.");
+      if (name.length < 2) return fail("Vui lòng nhập họ và tên.");
+      if (pw.length < 6) return fail("Mật khẩu cần ít nhất 6 ký tự.");
+      if (users[k] || k === OWNER_USER.toLowerCase()) return fail("Tên đăng nhập này đã có người dùng.");
+      if (S.blocked.includes(k)) return fail("Tên đăng nhập này đã bị chặn.");
+      users[k] = { username:un, name, hash:await sha(pw), created:new Date().toLocaleDateString("vi-VN") };
+      setUsers(users); msg = ""; setMe({role:"user", username:un, name}); return render();
+    }
+    const u = users[k];
+    if (!u || u.hash !== await sha(pw)) return fail("Sai tên đăng nhập hoặc mật khẩu.");
+    if (S.blocked.includes(k)) return fail("Tài khoản này đã bị chặn.");
+    msg = ""; setMe({role:"user", username:u.username, name:u.name}); render();
+  } catch(err) { fail("Trình duyệt chưa hỗ trợ đăng nhập an toàn. Hãy mở web bằng địa chỉ https."); }
+});
+const blobOf = async f => (await fetch(f.data)).blob();
+const files = () => { const s = subj(curId()); return s ? s[sec] : []; };
+const actions = {
+  lt(i){ tab = i; mode = "login"; msg = ""; render(); },
+  sw(){ mode = mode === "login" ? "register" : "login"; msg = ""; render(); },
+  users(){ page = "users"; render(); },
+  blk(i){ const k = i.toLowerCase(), n = S.blocked.indexOf(k); n < 0 ? S.blocked.push(k) : S.blocked.splice(n, 1); save(); render(); },
+  home(){ page = ""; q = ""; document.getElementById("q").value = ""; run = null; location.hash = ""; render(); },
+  sub(i){ page = ""; q = ""; document.getElementById("q").value = ""; location.hash = "mon-" + i; },
+  goto(i, j){ sec = j; actions.sub(i); render(); },
+  tab(i){ sec = i; render(); },
+  stop(){ run = null; render(); },
+  run(i){ run = files().find(f => f.id === i); render(); },
+  async open(i){ const f = files().find(x => x.id === i); window.open(URL.createObjectURL(await blobOf(f)), "_blank"); },
+  async dl(i){
+    const f = files().find(x => x.id === i), a = document.createElement("a");
+    a.href = sec === "practice" ? URL.createObjectURL(new Blob([f.data], {type:"text/html"})) : URL.createObjectURL(await blobOf(f));
+    a.download = f.name; a.click();
+  },
+  addSub(){ const n = prompt("Tên môn học mới:"); if (n && n.trim()) { S.subjects.push({id:uid(), name:n.trim(), theory:[], quizfile:[], practice:[]}); save(); render(); } },
+  delSub(i){ if (confirm("Xóa môn học này cùng toàn bộ tài liệu?")) { S.subjects = S.subjects.filter(s => s.id !== i); save(); actions.home(); } },
+  delFile(i){ if (confirm("Xóa tài liệu này?")) { const s = subj(curId()); s[sec] = s[sec].filter(f => f.id !== i); save(); render(); } },
+  export(){
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(S)], {type:"application/json"}));
+    a.download = "data.json"; a.click();
+  }
+};
+app.addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (b) actions[b.dataset.a](b.dataset.i, b.dataset.j); });
+app.addEventListener("change", e => {
+  if (e.target.id !== "up" || !e.target.files[0]) return;
+  const file = e.target.files[0], s = subj(curId());
+  if (file.size > MAX_MB * 1024 * 1024) return alert(`File quá lớn (tối đa ${MAX_MB} MB).`);
+  const r = new FileReader();
+  r.onload = () => {
+    s[sec].push({id:uid(), name:file.name, data:r.result, date:new Date().toLocaleDateString("vi-VN")});
+    save(); render();
+  };
+  sec === "practice" ? r.readAsText(file) : r.readAsDataURL(file);
+});
+document.getElementById("home").onclick = actions.home;
+document.getElementById("q").oninput = e => { q = e.target.value; run = null; render(); };
+document.getElementById("own").onclick = () => { setMe(null); run = null; page = ""; q = ""; document.getElementById("q").value = ""; location.hash = ""; render(); };
+window.addEventListener("hashchange", () => { run = null; page = ""; render(); });
+load().then(render);
+</script>
+</body>
+</html>

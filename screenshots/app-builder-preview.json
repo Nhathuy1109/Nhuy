@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Thư viện tài liệu",
+      "hasCanvas": false,
+      "bodyTextLen": 17,
+      "bodyTextHash": "95914f2dc5271630ae71b7e68027c96d91dd63445568e7a4effe6639a3dcb69c",
+      "bodyTextPrefix": "Đang mở thư viện…",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Thư viện tài liệu",
+      "hasCanvas": false,
+      "bodyTextLen": 204,
+      "bodyTextHash": "ab69d026e582a6fb6554fc4b50b494afe7766b9a3a064dd093e1203c6ad122fe",
+      "bodyTextPrefix": "Thư viện tài liệu Dùng được trên mọi máy User Owner Đăng nhập Tà",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}
